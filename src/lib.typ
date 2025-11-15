@@ -5,7 +5,7 @@
 
 // template formats the document as a lab report, essay or exam.
 #let template(
-	logo:              image("/inc/default_logo.png"),
+	logo:              none,
 	title:             "Lab report",
 	subtitle:          none,
 	page-header-title: none,
@@ -18,10 +18,14 @@
 	lab-supervisor:    none,
 	lab-group:         none,
 	lab-date:          none,
+	lang:              "en", // Language code: "en" for English, "it" for Italian
 
 	// Report contents.
 	body,
 ) = {
+	// Load locale translations
+	let locale-data = yaml("locale.yaml")
+	let loc = locale-data.at(lang, default: locale-data.en)
 	// Set document metadata.
 	set document(title: title)
 
@@ -70,7 +74,7 @@
 	show: hallon.style-figures
 
 	// Set title of bibliography.
-	set bibliography(title: "References")
+	set bibliography(title: loc.references)
 
 	// === [ Frontmatter ] ======================================================
 
@@ -105,7 +109,24 @@
 				// date
 				#text(size: 1.2em, {
 					let today = datetime.today()
-					nth(today.display("[day padding:none]"))
+					let day = int(today.display("[day padding:none]"))
+					
+					// Handle ordinal suffixes for English
+					if lang == "en" {
+						let suffix = if day == 1 or day == 21 or day == 31 {
+							loc.date_suffix_1
+						} else if day == 2 or day == 22 {
+							loc.date_suffix_2
+						} else if day == 3 or day == 23 {
+							loc.date_suffix_3
+						} else {
+							loc.date_suffix_default
+						}
+						[#day#super[#suffix]]
+					} else {
+						// For other languages, just display the day number
+						[#day]
+					}
 					today.display(" [month repr:long] [year]")
 				})
 
@@ -113,27 +134,27 @@
 
 				#let cells = ()
 				#if course-name != none {
-					cells.push([Course:])
+					cells.push([#loc.course:])
 					cells.push([#course-name])
 				}
 				#if course-part != none {
-					cells.push([Course part:])
+					cells.push([#loc.course_part:])
 					cells.push([#course-part])
 				}
 				#if lab-name != none {
-					cells.push([Lab:])
+					cells.push([#loc.lab:])
 					cells.push([#lab-name])
 				}
 				#if authors != none {
 					// support both array and string type for authors.
 					if type(authors) != array {
-						cells.push([Author:])
+						cells.push([#loc.author:])
 						cells.push([#authors])
 					} else {
 						if authors.len() > 1 {
-							cells.push([Authors:])
+							cells.push([#loc.authors:])
 						} else {
-							cells.push([Author:])
+							cells.push([#loc.author:])
 						}
 						cells.push([#authors.join(", ", last: " and ")])
 					}
@@ -141,27 +162,27 @@
 				#if lab-partners != none {
 					// support both array and string type for lab partners.
 					if type(lab-partners) != array {
-						cells.push([Lab partner:])
+						cells.push([#loc.lab_partner:])
 						cells.push([#lab-partners])
 					} else {
 						if lab-partners.len() > 1 {
-							cells.push([Lab partners:])
+							cells.push([#loc.lab_partners:])
 						} else {
-							cells.push([Lab partner:])
+							cells.push([#loc.lab_partner:])
 						}
 						cells.push([#lab-partners.join(", ", last: " and ")])
 					}
 				}
 				#if lab-supervisor != none {
-					cells.push([Lab supervisor:])
+					cells.push([#loc.lab_supervisor:])
 					cells.push([#lab-supervisor])
 				}
 				#if lab-group != none {
-					cells.push([Lab group:])
+					cells.push([#loc.lab_group:])
 					cells.push([#lab-group])
 				}
 				#if lab-date != none {
-					cells.push([Lab date:])
+					cells.push([#loc.lab_date:])
 					cells.push([#lab-date])
 				}
 				#block(inset: 0.4em)[
@@ -182,7 +203,7 @@
 	set page(numbering: "i")
 	counter(page).update(1)
 
-	outline()
+	outline(title: loc.outline)
 	pagebreak(weak: true)
 
 	// Style all links after outline.

@@ -1,6 +1,4 @@
-#import "@preview/efter-plugget:0.1.1"
-
-#let todo = highlight
+#import "src/lib.typ": *
 
 // hallon is an optional library for subfigures.
 #import "@preview/hallon:0.1.2": subfigure
@@ -9,20 +7,16 @@
 // smartaref is an optional library for handling consecutive references.
 #import "@preview/smartaref:0.1.0": cref, Cref
 
-#show: efter-plugget.template.with(
-	logo:              image("inc/logo.png"),
-	title:             todo[Lab 1 -- Stem Cells],
-	subtitle:          todo[An investigation into the effects of morphogens on differentiation],
-	page-header-title: todo("Lab 1"),
-	course-name:       todo("Course Name"),
-	course-code:       todo("AA1234"),
-	//course-part:     "",
-	lab-name:          todo("Stem cell differentiation"),
-	authors:           todo("Jane Rue"),
-	lab-partners:      (todo("John Doe"), todo("Eve Smith")),
-	//lab-supervisor:  "",
-	lab-group:         todo("Group 1"),
-	lab-date:          datetime.today().display(), // "2025-09-19"
+#show: template.with(
+	logo:              image("src/img/logo_sigillo.svg"),
+	title:             "Lab 1 -- Stem Cells",
+	subtitle:          "An investigation into the effects of morphogens on differentiation",
+	page-header-title: "Lab 1",
+	course-name:       "Course Name",
+	course-code:       "AA1234",
+	authors:           "Jane Rue",
+	lab-date:          datetime.today().display(),
+	lang:              "it",
 )
 
 #show: cellpress.style-table
@@ -48,7 +42,7 @@
 
 == Theory
 
-#lorem(10) @2020_molecular_biology_principles_of_genome_function_craig
+#lorem(10)
 
 #pagebreak(weak: true)
 
@@ -115,6 +109,6 @@ The results of the experiment are presented in @tbl-bar ...
 
 // === [ Bibliography ] ========================================================
 
-#bibliography("references.bib")
+#bibliography("src/references.yaml")
 
 #pagebreak(weak: true)
